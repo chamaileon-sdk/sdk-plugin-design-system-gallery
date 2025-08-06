@@ -24,7 +24,6 @@
     "@material-design-icons/svg": "^0.14.15",
     "cors": "^2.8.5",
     "express": "^5.1.0",
-    "minipass": "^7.1.2",
     "nconf": "^0.13.0",
     "sharp": "^0.34.3"
   },
