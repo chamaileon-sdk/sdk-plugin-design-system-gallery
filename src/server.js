@@ -2,7 +2,7 @@ import express from "express";
 import nconf from "nconf";
 import cors from "cors";
 import { createTerminus } from "@godaddy/terminus";
-import materialIconRoute from "./routes/icon.js";
+import materialIconRoute from "./routes/materialIconRoute.js";
 
 nconf.argv().file({ file: "config.json" || "./config.json" });
 const app = express();
@@ -27,7 +27,7 @@ if (!configFile.port) {
 	process.exit(1);
 }
 
-app.use("/material-icon", materialIconRoute());
+app.use("/material-icon", materialIconRoute);
 
 const server = app.listen(configFile.port, (err) => {
 	if (err) {
