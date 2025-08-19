@@ -7,13 +7,13 @@ const router = express.Router();
 
 router.get("/", (req, res) => {
 	try {
-		const { name, style, size, width, height, primary, secondary } = req.query;
+		const { name, style, size, primary, secondary } = req.query;
 
 		if (!name) {
 			return res.status(400).send("Name is required");
 		}
 
-		const iconSvg = getMaterialDesignIcon({ name, style, size, width, height, primary, secondary });
+		const iconSvg = getMaterialDesignIcon({ name, style, size, primary, secondary });
 
 		res.set({
 			"Content-Type": "image/png",
