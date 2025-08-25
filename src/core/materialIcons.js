@@ -4,20 +4,16 @@ import fs from "fs";
 import constants from "../utils/constants.js";
 
 const {
-	defaultPrimaryColor,
-	defaultSecondaryColor,
+	defaultColor,
 	defaultStyle,
 	defaultSize,
 } = constants;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const allowedStyles = ["outlined", "rounded", "sharp", "two-tone", "filled"];
 const sanitize = input => input.replace(/[^a-zA-Z0-9-_]/g, "");
 
-export default function ({ name, style = defaultStyle, size = defaultSize, primary = defaultPrimaryColor, secondary = defaultSecondaryColor }) {
+export default function ({ name, style = defaultStyle, size = defaultSize, color = defaultColor }) {
 	try {
-		if (!allowedStyles.includes(style)) throw new Error("Invalid style");
-
 		const iconPath = resolve(
 			__dirname,
 			"../../node_modules/@material-design-icons/svg",
@@ -30,18 +26,11 @@ export default function ({ name, style = defaultStyle, size = defaultSize, prima
 			throw new Error("Icon file not found");
 		}
 
-		let updatedSvg = svgFile
+		const updatedSvg = svgFile
 			.replace(/width\s*=\s*["]\d+["]/g, `width="${size}"`)
-			.replace(/height\s*=\s*["]\d+["]/g, `height="${size}"`);
+			.replace(/height\s*=\s*["]\d+["]/g, `height="${size}"`)
+			.replaceAll('<path d="', `<path fill="#${color}" d="`);
 
-		if (style === "two-tone") {
-			updatedSvg = updatedSvg
-				.replace('<path d="', `<path fill="#${secondary}" d="`)
-				.replace('<path d="', `<path fill="#${primary}" d="`);
-		} else {
-			updatedSvg = updatedSvg
-				.replace('<path d="', `<path fill="#${primary}" d="`);
-		}
 		return updatedSvg;
 	} catch (error) {
 		console.error(`Error reading icon file: ${error.message}`);

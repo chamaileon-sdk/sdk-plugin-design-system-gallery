@@ -1,6 +1,5 @@
 export default {
-	defaultPrimaryColor: "00C0E7",
-	defaultSecondaryColor: "FFFFFF",
+	defaultColor: "00C0E7",
 	defaultSize: "24",
 	defaultStyle: "filled",
 };
