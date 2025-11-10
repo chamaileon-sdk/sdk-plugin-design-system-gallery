@@ -3,6 +3,9 @@ import nconf from "nconf";
 import cors from "cors";
 import { createTerminus } from "@godaddy/terminus";
 import materialIconRoute from "./routes/materialIconRoute.js";
+import fs from "fs";
+import iconNamesArray from "./assets/iconNamesArray.js";
+const iconsHtml = fs.readFileSync("./assets/icons.html", "utf-8");
 
 nconf.argv().file({ file: "config.json" || "./config.json" });
 const app = express();
@@ -27,7 +30,16 @@ if (!configFile.port) {
 	process.exit(1);
 }
 
-app.use("/material-icon", materialIconRoute);
+app.use("/", materialIconRoute);
+
+app.get("/example", (req, res) => {
+	res.setHeader("Content-Type", "text/html");
+	res.status(200).send(iconsHtml);
+});
+
+app.get("/iconNamesArray", (req, res) => {
+	res.status(200).send(iconNamesArray);
+});
 
 const server = app.listen(configFile.port, (err) => {
 	if (err) {

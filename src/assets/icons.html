@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,500' rel='stylesheet'>
+  <link href='https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css' rel='stylesheet'>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined|Material+Icons+Two+Tone|Material+Icons+Round|Material+Icons+Sharp"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Social Embed Image Example</title>
+</head>
+
+<body>
+  <div id='app'>
+    <v-app>
+      <v-main>
+        <v-container fluid style="max-width: 500px;">
+          <h4>
+            Icons
+          </h4>
+          <v-row no-gutters class="mb-2">
+            <v-col cols="12">
+              <v-text-field outlined label="Search icon" dense hide-details v-model="iconName" type="text"
+                @change="iconName = $event" />
+            </v-col>
+          </v-row>
+          <v-row no-gutters class="mb-2 d-flex align-center">
+            <v-col cols="6">
+              <span class="font-weight-medium text-caption">Icon Type</span>
+              <v-select v-model="iconType" style="max-width: 232px;" outlined dense hide-details :items="iconOptions"
+                item-text="name" item-value="type" @change="changeIconType" />
+            </v-col>
+            <v-col cols="6">
+              <span class="font-weight-medium text-caption">
+                Icon Size ({{ iconSize }}px)
+              </span>
+              <v-slider v-model="iconSize" hide-details :thumb-size="32" :max="200" :min="1"
+                @change="iconSize = String(iconSize)" />
+            </v-col>
+          </v-row>
+          <v-row v-if="iconType !== 'humaaans'" no-gutters class="mb-2">
+            <v-col cols="6">
+                <span class="font-weight-medium text-caption">Icon Style</span>
+                <v-select v-model="iconStyle" style="max-width: 232px;" outlined dense hide-details :items="iconType === 'mdiIcons' ? mdiIconStylesArr : peepsIconStylesArr"
+                item-text="name" item-value="type" @change="changeIconStyle" />
+            </v-col>
+            <v-col cols="6">
+              <span class="font-weight-medium text-caption">Icon Color in HEX</span>
+              <v-text-field outlined dense hide-details v-model="iconColor" type="text"
+                @input="updateIconColor" />
+            </v-col>
+          </v-row>
+          <v-row
+            no-gutters
+            class="mb-2"
+            :class="{ 'disabled': true }"
+          >
+            <h6 class="text-h6 mb-2" style="width: 100%;">
+              Icon list to select from:
+            </h6>
+            <v-row
+              v-if="isIconsLoading"
+              no-gutters
+              class="d-flex align-center justify-center"
+            >
+              <v-progress-circular
+                v-if="isIconsLoading"
+                indeterminate
+                color="primary"
+                class="ma-4"
+              />
+            </v-row>
+            <div
+              v-else
+              ref="scrollContainer"
+              class="d-flex flex-wrap overflow-y-auto"
+              :style="{
+                maxHeight: '300px',
+                border: notSelectedErr ? '2px solid red' : 'none',
+              }"
+              @scroll="onScroll"
+            >
+              <v-row v-if="iconType === 'mdiIcons'" no-gutters>
+                <div
+                  v-for="(icon) in visibleMdiIcons"
+                  :key="icon"
+                  @click="selectIcon(icon)"
+                >
+                  <v-tooltip top>
+                    <template #activator="{ on: onTooltip, attrs: tooltipAttrs }">
+                      <span
+                        v-bind="tooltipAttrs"
+                        :class="iconStyle && iconStyle !== 'filled' ? `material-icons-${iconStyle}` : 'material-icons'"
+                        :style="{
+                          border: selectedIcon === icon ? '2px solid green' : '2px solid transparent',
+                          cursor: 'pointer',
+                          fontSize: '40px',
+                          color: iconStyle === 'two-tone' ? 'transparent' : iconColor,
+                          backgroundColor: iconStyle === 'two-tone' ? iconColor : 'transparent',
+                          backgroundClip: 'text',
+                        }"
+                        v-on="onTooltip"
+                      >
+                        {{ icon }}
+                      </span>
+                    </template>
+                    <span>{{ icon }}</span>
+                  </v-tooltip>
+                </div>
+              </v-row>
+              <v-row v-if="iconType === 'openPeepsIcons' && !isIconsLoading" no-gutters>
+                <div
+                  v-for="(icon, index) in visiblePeepsIcons"
+                  :key="icon.name + index"
+                  class="pa-1"
+                  @click="selectIcon(icon.name)"
+                >
+                  <v-tooltip top>
+                    <template #activator="{ on: onTooltip, attrs: tooltipAttrs }">
+                      <div
+                        class="d-flex align-center justify-center"
+                        v-bind="tooltipAttrs"
+                        :style="{
+                          border: selectedIcon === icon.name ? '2px solid green' : '2px solid transparent',
+                          cursor: 'pointer',
+                          color: iconColor,
+                        }"
+                        v-on="onTooltip"
+                        v-html="icon.content"
+                      />
+                    </template>
+                    <span>{{ icon.name }}</span>
+                  </v-tooltip>
+                </div>
+              </v-row>
+              <v-row v-if="iconType === 'humaaans' && !isIconsLoading" no-gutters>
+                <div
+                  v-for="(icon, index) in visibleHumaaansIcons"
+                  :key="icon.name + index"
+                  class="pa-1"
+                  @click="selectIcon(icon.name)"
+                >
+                  <v-tooltip top>
+                    <template #activator="{ on: onTooltip, attrs: tooltipAttrs }">
+                      <div
+                        class="d-flex align-center justify-center"
+                        v-bind="tooltipAttrs"
+                        :style="{
+                          border: selectedIcon === icon.name ? '2px solid green' : '2px solid transparent',
+                          cursor: 'pointer',
+                          color: iconColor,
+                        }"
+                        v-on="onTooltip"
+                        v-html="icon.content"
+                      />
+                    </template>
+                    <span>{{ icon.name }}</span>
+                  </v-tooltip>
+                </div>
+              </v-row>
+            </div>
+            <div style="min-height: 40px;" class="text-center py-2">
+              {{ loading ? "Loading.." : "" }}
+            </div>
+          </v-row>
+          <v-row no-gutters class="d-flex justify-end">
+            <v-btn color="primary" @click="insertIcon">
+              Insert Icon
+            </v-btn>
+          </v-row>
+          <v-row class="mt-5 d-flex justify-center">
+						<img
+							style="max-width: 500px; height: auto;"
+							:src="imgSourceUrl"
+						>
+					</div>
+        </v-container>
+      </v-main>
+    </v-app>
+  </div>
+
+  <script src='https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js'></script>
+  <script src='https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js'></script>
+  <script>
+    new Vue({
+      el: '#app',
+      vuetify: new Vuetify(),
+      data() {
+        return {
+          iconName: "",
+          iconSize: "32",
+          iconType: "mdiIcons",
+          iconStyle: "filled",
+          iconColor: "#00C0E7",
+          iconNamesArray: [],
+          sourceUrl: "",
+          defaultColor: "#00C0E7",
+          defaultSize: "32",
+          selectedIcon: null,
+			    isIconsLoading: false,
+          notSelectedErr: false,
+          iconsPerLoad: 100,
+          page: 0,
+          loading: false,
+          mdiIconStylesArr: [
+            "filled",
+            "outlined",
+            "round",
+            "sharp",
+            "two-tone",
+          ],
+          peepsIconStylesArr: [
+            "monochromatic",
+            "multicolor",
+          ],
+          iconOptions: [
+            {
+              type: "mdiIcons",
+              name: "Material Design Icons",
+            },
+            {
+              type: "openPeepsIcons",
+              name: "Open Peeps",
+            },
+            {
+              type: "humaaans",
+              name: "Humaaans",
+            },
+          ],
+          openPeepsIconsArray: {
+            monochromatic: [],
+            multicolor: [],
+          },
+          humaansIconsArray: [],
+        };
+      },
+      computed: {
+          imgSourceUrl() {
+            if (this.sourceUrl) return this.sourceUrl;
+            return "https://cdn.vuetifyjs.com/images/parallax/material.jpg";
+          },
+          allPeepsIcons: {
+            get() {
+              if (this.iconStyle === "monochromatic") return this.openPeepsIconsArray.monochromatic;
+              if (this.iconStyle === "multicolor") return this.openPeepsIconsArray.multicolor;
+              return [];
+            },
+            set(value) {
+              if (this.iconStyle === "monochromatic") this.openPeepsIconsArray.monochromatic = value;
+              if (this.iconStyle === "multicolor") this.openPeepsIconsArray.multicolor = value;
+            },
+          },
+          allHumaansIcons: {
+            get() {
+              return this.humaansIconsArray;
+            },
+            set(value) {
+              this.humaansIconsArray = value;
+            },
+          },
+          filteredMdiIcons() {
+            if (!this.iconName) return this.iconNamesArray;
+            return this.iconNamesArray.filter(icon => icon.includes(this.iconName));
+          },
+          filteredPeepsIcons() {
+            if (!this.iconName) return this.allPeepsIcons;
+            return this.allPeepsIcons.filter(icon => icon.name.includes(this.iconName));
+          },
+          filteredHumaans() {
+            if (!this.iconName) return this.allHumaansIcons;
+            return this.allHumaansIcons.filter(icon => icon.name.includes(this.iconName));
+          },
+          visibleMdiIcons() {
+            const end = (this.page + 1) * this.iconsPerLoad;
+            return this.filteredMdiIcons.slice(0, end);
+          },
+          visibleHumaaansIcons() {
+            const end = (this.page + 1) * this.iconsPerLoad;
+            return this.filteredHumaans.slice(0, end);
+          },
+          visiblePeepsIcons() {
+            const end = (this.page + 1) * this.iconsPerLoad;
+            return this.filteredPeepsIcons.slice(0, end);
+          },
+      },
+      async mounted(){
+        window.iconNamesArray = await fetch(window.location.origin + "/iconNamesArray").then(res => res.json());
+        window.humaansIconsArray = await fetch(window.location.origin + "/humaaans/svgs").then(res => res.json());
+        const { monochromaticOpenPeepsSvgs, multicolorOpenPeepsSvgs } = await fetch(window.location.origin + "/openPeepsIcons/svgs").then(res => res.json());
+        this.iconNamesArray = window.iconNamesArray;
+        this.humaansIconsArray = window.humaansIconsArray;
+        this.openPeepsIconsArray.monochromatic = monochromaticOpenPeepsSvgs;
+        this.openPeepsIconsArray.multicolor = multicolorOpenPeepsSvgs;
+        window.openPeepsIconsArray = this.openPeepsIconsArray;
+      },
+      methods: {
+        updateIconColor(color) {
+          if(!color) return this.iconColor = this.defaultColor;
+          if(color.length !== 7 || !/^#[0-9A-F]{6}$/i.test(color)) return;
+          if(this.iconType === "openPeepsIcons") return this.updateOpenPeepsColors(color);
+          this.iconColor = color;
+        },
+        updateOpenPeepsColors(color) {
+            if (!color) return;
+            if (this.iconStyle === "monochromatic") {
+              this.allPeepsIcons = this.openPeepsIconsArray.monochromatic.map((icon) => {
+                return {
+                  name: icon.name,
+                  content: icon.content.replace(/fill="(?!#ffffff|#FFFFFF|none)(.*?)"/gi, `fill="${color}"`),
+                };
+              });
+            }
+          },
+        async changeIconType(type) {
+          this.iconType = type;
+          if (type === "openPeepsIcons" && this.iconStyle !== "monochromatic" && this.iconStyle !== "multicolor"){
+            this.iconStyle = "monochromatic";
+            this.updateOpenPeepsColors(this.iconColor);
+          }
+          if (type === "mdiIcons") this.iconStyle = "filled";
+        },
+        async changeIconStyle(style) {
+          this.iconStyle = style;
+        },
+        selectIcon(icon) {
+          if (this.selectedIcon === icon) {
+            this.selectedIcon = "";
+            return;
+          }
+          this.selectedIcon = icon;
+          this.notSelectedErr = false;
+        },
+        insertIcon() {
+          if (!this.selectedIcon || !this.iconStyle || !this.iconSize || !this.iconColor) {
+            this.notSelectedErr = true;
+            return;
+          }
+          const iconColor = this.iconColor.replace("#", "");
+          const iconName = this.selectedIcon;
+          const type = this.iconType;
+          const iconGroup = type === "mdiIcons" ? "mdiIcons" : type === "openPeepsIcons" ? "openPeepsIcons" : "humaaans";
+          this.sourceUrl = `${window.location.origin}/${iconGroup}/${this.iconStyle}/${iconName}/${this.iconSize}/${iconColor}.png`;
+        },
+        onScroll(e) {
+          const el = e.target;
+          if (el.scrollTop + el.clientHeight >= el.scrollHeight - 100 && !this.loading) {
+            this.loadMore();
+          }
+        },
+        loadMore() {
+          if (this.iconType === "mdiIcons" && this.visibleMdiIcons.length >= this.filteredMdiIcons.length) return;
+          if (this.iconType === "openPeepsIcons" && this.visiblePeepsIcons.length >= this.filteredPeepsIcons.length) return;
+          this.loading = true;
+          setTimeout(() => {
+            this.page++;
+            this.loading = false;
+          }, 200);
+        },
+      }
+    })
+  </script>
+</body>
+
+</html>
