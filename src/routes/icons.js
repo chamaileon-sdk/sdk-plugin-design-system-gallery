@@ -1,13 +1,13 @@
 import express from "express";
+import sharp from "sharp";
 import {
+	getAllHumaaansIcons,
+	getAllPeepsIcons,
+	getHumaaansIcon,
 	getMaterialIcon,
 	getPeepsMonochromaticIcon,
 	getPeepsMultiColorIcon,
-	getAllPeepsIcons,
-	getAllHumaaansIcons,
-	getHumaaansIcon,
-} from "../core/materialIcons.js";
-import sharp from "sharp";
+} from "../core/icons.js";
 
 // eslint-disable-next-line new-cap
 const router = express.Router();
@@ -18,10 +18,9 @@ const defaults = {
 	mdiStyle: "filled",
 };
 
-router.get("/mdiIcons/:iconStyle/:iconName/:iconSize/:iconColor", (req, res) => {
+router.get("/mdiIcons/:iconStyle/:iconName/:iconSize/:iconColor.png", (req, res) => {
 	try {
 		const { iconName, iconStyle, iconSize, iconColor } = req.params;
-
 		if (!iconName) {
 			return res.status(400).send("Icon is required");
 		}

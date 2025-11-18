@@ -1,6 +1,6 @@
 {
   "name": "sdk-plugin-design-system-gallery",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "",
   "type": "module",
   "homepage": "https://github.com/chamaileon-sdk/sdk-plugin-design-system-gallery/blob/master/README.md",
@@ -14,7 +14,7 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "cd src && node --watch server.js",
-    "lint": "npx eslint . --ext .js,.mjs,.cjs,.json,.vue  --resolve-plugins-relative-to ./node_modules/@edmdesigner/eslint-config-edmdesigner",
+    "lint": "npx eslint . --ext .js,.mjs,.cjs,.json,.vue  --resolve-plugins-relative-to ./node_modules/@chamaileon-sdk/eslint-config",
     "lint-fix": "npm run lint -- --fix",
     "prepare": "husky install",
     "test": "npm run lint"
@@ -28,7 +28,7 @@
     "sharp": "^0.34.5"
   },
   "devDependencies": {
-    "@edmdesigner/eslint-config-edmdesigner": "^3.0.0",
+    "@chamaileon-sdk/eslint-config": "^3.0.0",
     "@types/node": "^24.0.12",
     "husky": "^8.0.0"
   },
