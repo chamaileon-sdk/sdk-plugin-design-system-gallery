@@ -3,6 +3,6 @@
     "sourceType": "module"
   },
 	"extends": [
-		"@edmdesigner/eslint-config-edmdesigner/lib/defaults"
+		"@chamaileon-sdk/eslint-config/lib/defaults"
 	]
 }
