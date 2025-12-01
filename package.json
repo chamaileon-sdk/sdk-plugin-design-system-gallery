@@ -29,7 +29,6 @@
   },
   "devDependencies": {
     "@chamaileon-sdk/eslint-config": "^3.0.0",
-    "@types/node": "^24.0.12",
     "husky": "^8.0.0"
   },
   "author": "",
